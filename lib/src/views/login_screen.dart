@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:live_polling_voting_app/live_polling_voting_app.dart';
 
-
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final storedText = ref.watch(sharedPrefsProvider);
+    // final storedText = ref.watch(sharedPrefsProvider);
     final textController = TextEditingController();
 
     return Scaffold(
@@ -22,23 +21,40 @@ class LoginScreen extends ConsumerWidget {
               decoration: InputDecoration(labelText: "Enter username"),
             ),
             SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                ref.read(sharedPrefsProvider.notifier).saveText(textController.text);
-              },
-              child: Text("Login"),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                ref.read(sharedPrefsProvider.notifier).deleteText();
-              },
-              child: Text("Delete Text"),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "Stored Value: $storedText",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ref
+                          .read(sharedPrefsProvider.notifier)
+                          .saveText(textController.text)
+                          .then(
+                        (value) {
+                          if (context.mounted) {
+                            if (value.isNotEmpty) {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PollsScreen(
+                                      loggedInUser: value,
+                                    ),
+                                  ));
+                            } else {
+                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text('Please enter a username',
+                                  style: TextStyle(color: Colors.white)),
+                              backgroundColor: Colors.red,
+                            ));
+                            }
+                          }
+                        },
+                      );
+                    },
+                    child: Text("Login"),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

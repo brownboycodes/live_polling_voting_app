@@ -18,7 +18,8 @@ class PollNotifier extends StateNotifier<List<Poll>> {
   /// Add a new Poll
   Future<void> addPoll(Poll poll) async {
     await _box.put(poll.id, poll);
-    _loadPolls(); // Update state
+    _loadPolls();
+
   }
 
   /// Update an existing Poll
@@ -31,6 +32,10 @@ class PollNotifier extends StateNotifier<List<Poll>> {
   Future<void> deletePoll(int pollId) async {
     await _box.delete(pollId);
     _loadPolls();
+  }
+
+  void recordVote(Poll poll, PollOption option){
+
   }
 }
 

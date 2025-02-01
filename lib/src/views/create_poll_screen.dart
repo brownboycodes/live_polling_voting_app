@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:live_polling_voting_app/live_polling_voting_app.dart';
 
-class CreatePollScreen extends StatefulWidget {
-  const CreatePollScreen({super.key});
+class CreatePollScreen extends ConsumerStatefulWidget {
+  const CreatePollScreen({super.key, required this.loggedInUser});
+
+  ///[loggedInUser] will be used for creating polls
+  final String loggedInUser;
 
   @override
   _CreatePollScreenState createState() => _CreatePollScreenState();
 }
 
-class _CreatePollScreenState extends State<CreatePollScreen> {
+class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
   final _formKey = GlobalKey<FormState>();
   late ButtonStyling defaultButtonStyling;
   final TextEditingController _questionController = TextEditingController();
@@ -40,11 +44,24 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
 
       print("Question: $question");
       print("Options: $options");
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Form Saved Successfully!")),
       );
     }
+  }
+
+  void _createPoll(String question, List<String> options) {
+    final poll = Poll(
+        id: DateTime.now().millisecondsSinceEpoch,
+        question: question,
+        options: options
+            .map(
+              (option) => PollOption(
+                  id: DateTime.now().millisecondsSinceEpoch, option: option),
+            )
+            .toList(),
+        createdBy: widget.loggedInUser);
+    ref.read(pollProvider.notifier).addPoll(poll);
   }
 
   /// Delete an option field (Ensuring at least two fields remain)
@@ -138,9 +155,12 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                           ? _addOptionField
                           : null,
                       style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: defaultButtonStyling.borderRadius ?? BorderRadius.zero,
-                              side: defaultButtonStyling.borderSide ?? BorderSide.none),),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: defaultButtonStyling.borderRadius ??
+                                BorderRadius.zero,
+                            side: defaultButtonStyling.borderSide ??
+                                BorderSide.none),
+                      ),
                       child: Text("Add Option"),
                     ),
                   ),
@@ -151,8 +171,10 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepPurple.shade300,
                           shape: RoundedRectangleBorder(
-                              borderRadius: defaultButtonStyling.borderRadius ?? BorderRadius.zero,
-                              side: defaultButtonStyling.borderSide ?? BorderSide.none)),
+                              borderRadius: defaultButtonStyling.borderRadius ??
+                                  BorderRadius.zero,
+                              side: defaultButtonStyling.borderSide ??
+                                  BorderSide.none)),
                       child: Text(
                         "Create Poll",
                         style: TextStyle(color: Colors.white),

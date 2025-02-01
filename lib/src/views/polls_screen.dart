@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:live_polling_voting_app/live_polling_voting_app.dart';
 
 class PollsScreen extends ConsumerWidget {
-  const PollsScreen({super.key});
+  const PollsScreen({super.key, required this.loggedInUser});
+
+  ///[loggedInUser] will be used for creating and voting polls
+  final String loggedInUser;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,7 +18,17 @@ class PollsScreen extends ConsumerWidget {
         actions: [
           IconButton(
               onPressed: () {
-                ref.read(sharedPrefsProvider.notifier).deleteText();
+                ref.read(sharedPrefsProvider.notifier).deleteText().then(
+                  (value) {
+                    if (context.mounted) {
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                        builder: (context) {
+                          return LoginScreen();
+                        },
+                      ));
+                    }
+                  },
+                );
               },
               icon: Icon(
                 Icons.power_settings_new_rounded,
@@ -52,12 +65,13 @@ class PollsScreen extends ConsumerWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CreatePollScreen(),
+                builder: (context) => CreatePollScreen(
+                  loggedInUser: loggedInUser,
+                ),
               ));
         },
         child: Icon(Icons.add),
       ),
     );
   }
-
 }

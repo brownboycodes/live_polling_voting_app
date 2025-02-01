@@ -5,7 +5,7 @@ part 'poll.g.dart';
 
 @HiveType(typeId: 0)
 class Poll {
-  Poll({required this.id,required this.question, required this.options, this.totalVotes = 0});
+  Poll({required this.id,required this.question, required this.options, this.totalVotes = 0, required this.createdBy});
 
   ///[id] is the unique identifier of the poll
   @HiveField(0)
@@ -23,15 +23,20 @@ class Poll {
   @HiveField(3)
   int totalVotes;
 
+  @HiveField(4)
+  String createdBy;
+
   factory Poll.fromJson(Map<String, dynamic> json) {
     return Poll(
         id: json['id'],
         question: json['question'],
         options: json['options'].cast<String>(),
-        totalVotes: json['votes'].cast<int>());
+        totalVotes: json['votes'].cast<int>(),
+        createdBy: json['createdBy']
+    );
   }
 
   Map<String, dynamic> toJson() {
-    return {'id':id, 'question': question, 'options': options, 'totalVotes': totalVotes};
+    return {'id':id, 'question': question, 'options': options, 'totalVotes': totalVotes, 'createdBy':createdBy};
   }
 }
