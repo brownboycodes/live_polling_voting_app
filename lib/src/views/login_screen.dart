@@ -7,7 +7,8 @@ class LoginScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final storedText = ref.watch(sharedPrefsProvider);
+    final defaultButtonStyle = StyleHelper.getTheme<ButtonStyling>(
+        context: context, defaultTheme: ButtonStyling.defaultStyle());
     final textController = TextEditingController();
 
     return Scaffold(
@@ -18,7 +19,7 @@ class LoginScreen extends ConsumerWidget {
           children: [
             TextField(
               controller: textController,
-              decoration: InputDecoration(labelText: "Enter username"),
+              decoration: InputDecoration(hintText: "Enter username",border: OutlineInputBorder(),),
             ),
             SizedBox(height: 10),
             Row(
@@ -51,7 +52,14 @@ class LoginScreen extends ConsumerWidget {
                         },
                       );
                     },
-                    child: Text("Login"),
+                    style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple.shade300,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: defaultButtonStyle.borderRadius ??
+                                    BorderRadius.zero,
+                                side: defaultButtonStyle.borderSide ??
+                                    BorderSide.none)),
+                    child: Text("Login",style: TextStyle(color: Colors.white),),
                   ),
                 ),
               ],

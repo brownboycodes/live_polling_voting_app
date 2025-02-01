@@ -28,7 +28,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           appBarTheme: AppBarTheme(
-            // backgroundColor: Colors.deepPurple.shade300,
+            titleTextStyle: TextStyle(
+              fontSize: 24,
+              color: Colors.black,
+              fontWeight: FontWeight.w500
+            ),
             shape: RoundedRectangleBorder(
               side: BorderSide(color: Colors.deepPurple.shade300),
             ),

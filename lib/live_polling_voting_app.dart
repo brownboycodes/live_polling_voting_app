@@ -5,6 +5,7 @@ export 'package:live_polling_voting_app/src/models/poll_option.dart';
 //providers
 export 'package:live_polling_voting_app/src/providers/shared_preferences_provider.dart';
 export 'package:live_polling_voting_app/src/providers/polls_provider.dart';
+export 'package:live_polling_voting_app/src/providers/active_poll_state_provider.dart';
 
 //views
 export 'package:live_polling_voting_app/src/views/login_screen.dart';
@@ -13,8 +14,13 @@ export 'package:live_polling_voting_app/src/views/guard_screen.dart';
 export 'package:live_polling_voting_app/src/views/polls_screen.dart';
 export 'package:live_polling_voting_app/src/views/poll_result.dart';
 
+//view models
+export 'package:live_polling_voting_app/src/view_models/guard_screen_view_model.dart';
+export 'package:live_polling_voting_app/src/view_models/create_poll_screen_view_model.dart';
+
 //styles
 export 'package:live_polling_voting_app/src/styles/button_styling.dart';
+export 'package:live_polling_voting_app/src/styles/poll_option_style.dart';
 
 //utils
 export 'package:live_polling_voting_app/src/utils/style_helper.dart';

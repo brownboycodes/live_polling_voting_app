@@ -14,12 +14,20 @@ class CreatePollScreen extends ConsumerStatefulWidget {
 
 class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
   final _formKey = GlobalKey<FormState>();
-  late ButtonStyling defaultButtonStyling;
+  late ButtonStyling defaultButtonStyle;
+  late PollOptionStyle pollOptionStyle;
   final TextEditingController _questionController = TextEditingController();
   final List<TextEditingController> _optionControllers = List.generate(
     2,
     (index) => TextEditingController(),
   );
+  late CreatePollScreenViewModel viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    viewModel = CreatePollScreenViewModel(ref, widget.loggedInUser);
+  }
 
   @override
   void dispose() {
@@ -34,39 +42,6 @@ class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
     setState(() {
       _optionControllers.add(TextEditingController());
     });
-  }
-
-  void _saveForm() {
-    if (_formKey.currentState!.validate()) {
-      String question = _questionController.text.trim();
-      List<String> options =
-          _optionControllers.map((c) => c.text.trim()).toList();
-
-      print("Question: $question");
-      print("Options: $options");
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text("Form Saved Successfully!")),
-      // );
-      _createPoll(question, options);
-    }
-  }
-
-  void _createPoll(String question, List<String> options) {
-    final poll = Poll(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        question: question,
-        options: options
-            .map(
-              (option) => PollOption(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(), option: option),
-            )
-            .toList(),
-        createdBy: widget.loggedInUser);
-    ref.read(pollProvider.notifier).addPoll(poll).then((value){
-      if(context.mounted){
-         Navigator.pop(context);
-      }
-    },);
   }
 
   /// Delete an option field (Ensuring at least two fields remain)
@@ -85,7 +60,7 @@ class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
 
   @override
   void didChangeDependencies() {
-    defaultButtonStyling = StyleHelper.getTheme<ButtonStyling>(
+    defaultButtonStyle = StyleHelper.getTheme<ButtonStyling>(
         context: context, defaultTheme: ButtonStyling.defaultStyle());
     super.didChangeDependencies();
   }
@@ -99,25 +74,25 @@ class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey, // Attach form key
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text("Enter your question:",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 TextFormField(
                   controller: _questionController,
                   decoration: InputDecoration(
                     hintText: "Type your question here...",
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) => value == null || value.trim().isEmpty
-                      ? "Please enter a question"
-                      : null, // Validation
+                  validator: (value) => viewModel.questionInputValidator(value,"Please enter a question"), // Validation
                 ),
                 SizedBox(height: 20),
                 Text("Enter options:",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Column(
                   children: _optionControllers.asMap().entries.map((entry) {
                     int index = entry.key;
@@ -134,10 +109,7 @@ class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
                                 hintText: "Option ${index + 1}",
                                 border: OutlineInputBorder(),
                               ),
-                              validator: (value) =>
-                                  value == null || value.trim().isEmpty
-                                      ? "Option ${index + 1} is required"
-                                      : null, // Validation
+                              validator: (value) => viewModel.questionInputValidator(value, "Option ${index + 1} is required") , // Validation
                             ),
                           ),
                           SizedBox(width: 10),
@@ -163,9 +135,9 @@ class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
                             : null,
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
-                              borderRadius: defaultButtonStyling.borderRadius ??
+                              borderRadius: defaultButtonStyle.borderRadius ??
                                   BorderRadius.zero,
-                              side: defaultButtonStyling.borderSide ??
+                              side: defaultButtonStyle.borderSide ??
                                   BorderSide.none),
                         ),
                         child: Text("Add Option"),
@@ -174,13 +146,19 @@ class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
                     SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: _saveForm,
+                        onPressed: () {
+                          viewModel.saveForm(
+                              context: context,
+                              formKey: _formKey,
+                              optionControllers: _optionControllers,
+                              questionController: _questionController);
+                        },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurple.shade300,
                             shape: RoundedRectangleBorder(
-                                borderRadius: defaultButtonStyling.borderRadius ??
+                                borderRadius: defaultButtonStyle.borderRadius ??
                                     BorderRadius.zero,
-                                side: defaultButtonStyling.borderSide ??
+                                side: defaultButtonStyle.borderSide ??
                                     BorderSide.none)),
                         child: Text(
                           "Create Poll",

@@ -43,30 +43,52 @@ class PollsScreen extends ConsumerWidget {
               itemCount: polls.length,
               itemBuilder: (context, index) {
                 final poll = polls[index];
-                return ListTile(
-                  title: Text(poll.question),
-                  subtitle: Text("Total Votes: ${poll.totalVotes}"),
-                  // trailing: Row(
-                  //   mainAxisSize: MainAxisSize.min,
-                  //   children: [
-                  //     IconButton(
-                  //       icon: Icon(Icons.delete, color: Colors.red),
-                  //       onPressed: () {
-                  //         ref.read(pollProvider.notifier).deletePoll(poll.id);
-                  //       },
-                  //     ),
-                  //   ],
-                  // ),
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return _hasVoted(poll.options)
-                            ? PollResult(poll: poll, loggedInUser: loggedInUser)
-                            : PollVotingScreen(
-                                poll: poll, loggedInUser: loggedInUser);
-                      },
-                    ));
+                return Dismissible(
+                  key: ValueKey<String>(poll.id),
+                  onDismissed: (direction) {
+                    ref.read(pollProvider.notifier).deletePoll(poll.id);
                   },
+                  background: Container(
+                    color: Colors.red,
+                    child: Icon(Icons.cancel),
+                  ),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                        color: index % 2 == 0
+                            ? Colors.yellow.shade100
+                            : Colors.purple.shade100),
+                    child: ListTile(
+                      title: Text(poll.question,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.headlineSmall),
+                      subtitle: Text("Total Votes: ${poll.totalVotes}",
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyLarge),
+
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) {
+                            if (_hasVoted(poll.options)) {
+                              return Scaffold(
+                                  appBar: AppBar(
+                                    title: Text("Poll Result"),
+                                  ),
+                                  body: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: PollResult(
+                                        poll: poll, loggedInUser: loggedInUser),
+                                  ));
+                            } else {
+                              return PollVotingScreen(
+                                  poll: poll, loggedInUser: loggedInUser);
+                            }
+                          },
+                        ));
+                      },
+                    ),
+                  ),
                 );
               },
             ),
