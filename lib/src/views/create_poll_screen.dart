@@ -44,24 +44,29 @@ class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
 
       print("Question: $question");
       print("Options: $options");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Form Saved Successfully!")),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text("Form Saved Successfully!")),
+      // );
+      _createPoll(question, options);
     }
   }
 
   void _createPoll(String question, List<String> options) {
     final poll = Poll(
-        id: DateTime.now().millisecondsSinceEpoch,
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
         question: question,
         options: options
             .map(
               (option) => PollOption(
-                  id: DateTime.now().millisecondsSinceEpoch, option: option),
+                  id: DateTime.now().millisecondsSinceEpoch.toString(), option: option),
             )
             .toList(),
         createdBy: widget.loggedInUser);
-    ref.read(pollProvider.notifier).addPoll(poll);
+    ref.read(pollProvider.notifier).addPoll(poll).then((value){
+      if(context.mounted){
+         Navigator.pop(context);
+      }
+    },);
   }
 
   /// Delete an option field (Ensuring at least two fields remain)
@@ -89,101 +94,104 @@ class _CreatePollScreenState extends ConsumerState<CreatePollScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Create Poll")),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey, // Attach form key
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text("Enter your question:",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              TextFormField(
-                controller: _questionController,
-                decoration: InputDecoration(
-                  hintText: "Type your question here...",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) => value == null || value.trim().isEmpty
-                    ? "Please enter a question"
-                    : null, // Validation
-              ),
-              SizedBox(height: 20),
-              Text("Enter options:",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              Column(
-                children: _optionControllers.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  TextEditingController controller = entry.value;
-
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 5),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: controller,
-                            decoration: InputDecoration(
-                              hintText: "Option ${index + 1}",
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (value) =>
-                                value == null || value.trim().isEmpty
-                                    ? "Option ${index + 1} is required"
-                                    : null, // Validation
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        if (_optionControllers.length >
-                            2) // Displaying delete button only if there are more than two options
-                          IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _deleteOptionField(index),
-                          ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _optionControllers.length < 4
-                          ? _addOptionField
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: defaultButtonStyling.borderRadius ??
-                                BorderRadius.zero,
-                            side: defaultButtonStyling.borderSide ??
-                                BorderSide.none),
-                      ),
-                      child: Text("Add Option"),
-                    ),
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey, // Attach form key
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Enter your question:",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                TextFormField(
+                  controller: _questionController,
+                  decoration: InputDecoration(
+                    hintText: "Type your question here...",
+                    border: OutlineInputBorder(),
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _saveForm,
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple.shade300,
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? "Please enter a question"
+                      : null, // Validation
+                ),
+                SizedBox(height: 20),
+                Text("Enter options:",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Column(
+                  children: _optionControllers.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    TextEditingController controller = entry.value;
+
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 5),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: controller,
+                              decoration: InputDecoration(
+                                hintText: "Option ${index + 1}",
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (value) =>
+                                  value == null || value.trim().isEmpty
+                                      ? "Option ${index + 1} is required"
+                                      : null, // Validation
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          if (_optionControllers.length >
+                              2) // Displaying delete button only if there are more than two options
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteOptionField(index),
+                            ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _optionControllers.length < 4
+                            ? _addOptionField
+                            : null,
+                        style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                               borderRadius: defaultButtonStyling.borderRadius ??
                                   BorderRadius.zero,
                               side: defaultButtonStyling.borderSide ??
-                                  BorderSide.none)),
-                      child: Text(
-                        "Create Poll",
-                        style: TextStyle(color: Colors.white),
+                                  BorderSide.none),
+                        ),
+                        child: Text("Add Option"),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _saveForm,
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple.shade300,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: defaultButtonStyling.borderRadius ??
+                                    BorderRadius.zero,
+                                side: defaultButtonStyling.borderSide ??
+                                    BorderSide.none)),
+                        child: Text(
+                          "Create Poll",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

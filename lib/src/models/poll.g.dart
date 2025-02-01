@@ -17,7 +17,7 @@ class PollAdapter extends TypeAdapter<Poll> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Poll(
-      id: fields[0] as int,
+      id: fields[0] as String,
       question: fields[1] as String,
       options: (fields[2] as List).cast<PollOption>(),
       totalVotes: fields[3] as int,

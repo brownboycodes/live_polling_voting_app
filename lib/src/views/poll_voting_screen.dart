@@ -18,17 +18,31 @@ class PollVotingScreen extends ConsumerWidget {
         title: Text("Cast your Vote"),
       ),
       body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            Text(poll.question),
+            Row(
+              children: [
+                Flexible(child: Text(poll.question)),
+              ],
+            ),
             for(int index=0; index<poll.options.length; index++)
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(poll.options[index].option),
                   ElevatedButton(onPressed: () {
                     poll.options[index].votedBy.add(loggedInUser);
                     ref.read(pollProvider.notifier).updatePoll(poll);
-                  }, child: Text("VOTE",style: TextStyle(color: Colors.white)))
+                  }, child: Text("VOTE",style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade700,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)
+                    )
+                  ),
+
+                  )
                 ],
               )
           ],

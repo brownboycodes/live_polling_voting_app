@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:live_polling_voting_app/live_polling_voting_app.dart';
+import 'package:live_polling_voting_app/src/views/poll_voting_screen.dart';
 
 class PollsScreen extends ConsumerWidget {
   const PollsScreen({super.key, required this.loggedInUser});
@@ -45,18 +46,27 @@ class PollsScreen extends ConsumerWidget {
                 return ListTile(
                   title: Text(poll.question),
                   subtitle: Text("Total Votes: ${poll.totalVotes}"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          ref.read(pollProvider.notifier).deletePoll(poll.id);
-                        },
-                      ),
-                    ],
-                  ),
-                  onTap: () {},
+                  // trailing: Row(
+                  //   mainAxisSize: MainAxisSize.min,
+                  //   children: [
+                  //     IconButton(
+                  //       icon: Icon(Icons.delete, color: Colors.red),
+                  //       onPressed: () {
+                  //         ref.read(pollProvider.notifier).deletePoll(poll.id);
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return _hasVoted(poll.options)
+                            ? PollResult(poll: poll, loggedInUser: loggedInUser)
+                            : PollVotingScreen(
+                                poll: poll, loggedInUser: loggedInUser);
+                      },
+                    ));
+                  },
                 );
               },
             ),
@@ -73,5 +83,17 @@ class PollsScreen extends ConsumerWidget {
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  bool _hasVoted(List<PollOption> options) {
+    bool hasVoted = false;
+
+    for (PollOption option in options) {
+      hasVoted = option.hasVoted(loggedInUser);
+      if (hasVoted) {
+        break;
+      }
+    }
+    return hasVoted;
   }
 }

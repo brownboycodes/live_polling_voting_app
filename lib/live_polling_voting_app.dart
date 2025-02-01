@@ -11,6 +11,7 @@ export 'package:live_polling_voting_app/src/views/login_screen.dart';
 export 'package:live_polling_voting_app/src/views/create_poll_screen.dart';
 export 'package:live_polling_voting_app/src/views/guard_screen.dart';
 export 'package:live_polling_voting_app/src/views/polls_screen.dart';
+export 'package:live_polling_voting_app/src/views/poll_result.dart';
 
 //styles
 export 'package:live_polling_voting_app/src/styles/button_styling.dart';
