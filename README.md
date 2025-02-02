@@ -12,3 +12,4 @@ A Live Polling & Voting App where users can log in with a username, vote on poll
   - Has a logout button in the top right corner in the AppBar. 
   - And the Floating Action Button in the bottom right corner shall take you to a screen where you can create a poll. 
   - The poll items can be deleted from the list by swiping left 
+- Tapping on the share icon below the poll result will allow users to share the poll result as an image
