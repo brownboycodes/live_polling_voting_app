@@ -17,6 +17,7 @@ export 'package:live_polling_voting_app/src/views/poll_result.dart';
 //view models
 export 'package:live_polling_voting_app/src/view_models/guard_screen_view_model.dart';
 export 'package:live_polling_voting_app/src/view_models/create_poll_screen_view_model.dart';
+export 'package:live_polling_voting_app/src/view_models/poll_result_view_model.dart';
 
 //styles
 export 'package:live_polling_voting_app/src/styles/button_styling.dart';
